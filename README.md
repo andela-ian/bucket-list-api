@@ -1,4 +1,4 @@
-BucketList Application API
+BucketList Application API ![Travis build badge](https://travis-ci.org/andela-osule/bucket-list-api.svg?branch=master)
 ==========================
 This is a Flask API for a bucket list service. Specification for the API is shown below.
 
