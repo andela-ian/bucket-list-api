@@ -1,6 +1,7 @@
 from flask import make_response, jsonify, session
 from functools import wraps
-from models import User
+from models import User, db
+from tools import decypher
 
 
 def check_auth(username, password):
@@ -29,3 +30,13 @@ def requires_auth(f):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
+
+
+def get_current_user_id():
+    """Returns the current user id in the session
+    """
+    username, password = decypher(session['user'])
+    query_result = db.session.query(User).filter(
+            User.username == username,
+            User.password == password).first()
+    return query_result.id
