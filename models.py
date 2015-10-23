@@ -1,4 +1,5 @@
 from flask.ext.sqlalchemy import SQLAlchemy
+from tools import list_object_transform
 
 db = SQLAlchemy()
 
@@ -56,9 +57,10 @@ class BucketList(Base):
         return {
             "id": self.id,
             "name": self.name,
+            "bucketlistitems": list_object_transform(self.bucketlistitems),
+            "date_created": self.date_created,
+            "date_modified": self.date_modified,
             "created_by": self.created_by,
-            "user": self.user.id,
-            "bucketlistitems": self.bucketlistitems
         }
 
     @staticmethod
@@ -82,3 +84,12 @@ class BucketListItem(Base):
         self.bucketlist_id = bucketlist_id
         self.name = name
         self.done = done
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "date_created": self.date_created,
+            "date_modified": self.date_modified,
+            "done": self.done,
+        }
