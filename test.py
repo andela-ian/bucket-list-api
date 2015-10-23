@@ -1,6 +1,7 @@
 from models import db, User
 from app import create_app
 from auth import MESSAGES
+from faker import Faker
 import unittest
 import os
 import json
@@ -24,19 +25,14 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure that correct login behaves correctly
     # ENDPOINT: POST '/login'
     def test_correct_login(self):
-        rv = self.client().post(
-            '/login',
-            data=self.user_data
-            )
+        rv = self.client().post('/login', data=self.user_data)
         self.assertEqual(rv.status_code, 200)
         self.assertIn(MESSAGES['login'], rv.data)
 
     # Ensure that logout behave correctly
     # ENDPOINT: GET '/logout'
     def test_logout(self):
-        resp = self.client().post(
-            '/login',
-            data=self.user_data)
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -48,9 +44,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure that user can retrieve his/her bucketlist items
     # ENDPOINT: GET '/bucketlists'
     def test_user_can_retrieve_bucketlist_items(self):
-        resp = self.client().post(
-            '/login',
-            data=self.user_data)
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -69,9 +63,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure user can create new bucketlist
     # ENDPOINT: POST '/bucketlists'
     def test_user_can_create_new_bucketlist(self):
-        resp = self.client().post(
-            '/login',
-            data=self.user_data)
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -84,9 +76,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure user can get buckletlist by id
     # ENDPOINT: GET /bucketlists/<id>
     def test_user_can_get_bucketlist_by_id(self):
-        resp = self.client().post(
-            '/login',
-            data=self.user_data)
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -101,9 +91,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure user can update bucketlist by id
     # ENDPOINT: PUT /bucketlists/<id>
     def test_user_can_update_bucketlist_by_id(self):
-        resp = self.client().post(
-            '/login',
-            data=self.user_data)
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {
@@ -121,9 +109,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure user can delete bucketlist by id
     # ENDPOINT: DELETE /bucketlist/<id>
     def test_user_can_delete_bucketlist_by_id(self):
-        resp = self.client().post(
-            '/login',
-            data=self.user_data)
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {
@@ -135,15 +121,12 @@ class BucketListTestCase(unittest.TestCase):
         rv = self.client().delete(
             '/bucketlists/1',
             headers=headers)
-        self.assertEqual(rv.status_code, 410)
+        self.assertEqual(rv.status_code, 200)
 
     # Ensure user can create new bucketlist item
     # ENDPOINT: POST /bucketlists/<id>/items
     def test_user_can_create_new_bucketlist_item(self):
-        resp = self.client().post(
-            '/login',
-            data={'username': 'john', 'password': 'oldman'}
-            )
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -159,10 +142,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure user can get new bucketlist item by item_id
     # ENDPOINT: GET /bucketlists/<id>/items/<item_id>
     def test_user_can_get_bucketlist_item_by_id(self):
-        resp = self.client().post(
-            '/login',
-            data={'username': 'john', 'password': 'oldman'}
-            )
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -181,10 +161,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure user can update new bucketlist item by item_id
     # ENDPOINT: PUT /bucketlists/<id>/items/<item_id>
     def test_user_can_update_bucketlist_item_by_id(self):
-        resp = self.client().post(
-            '/login',
-            data={'username': 'john', 'password': 'oldman'}
-            )
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -204,10 +181,7 @@ class BucketListTestCase(unittest.TestCase):
     # Ensure user can delete new bucketlist item by item_id
     # ENDPOINT: DELETE /bucketlists/<id>/items/<item_id>
     def test_can_delete_bucketlist_item_by_id(self):
-        resp = self.client().post(
-            '/login',
-            data={'username': 'john', 'password': 'oldman'}
-            )
+        resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
@@ -221,7 +195,30 @@ class BucketListTestCase(unittest.TestCase):
         rv = self.client().delete(
             '/bucketlists/1/items/1',
             headers=headers)
-        self.assertEqual(rv.status_code, 410)
+        self.assertEqual(rv.status_code, 200)
+
+    # Ensure user can gets 20 bucket list records up
+    # to a maximum of 100 records
+    # ENDPOINT: GET /bucketlists?limit=20
+    def test_can_get_bucket_list_records_up_to_a_hundred(self):
+        resp = self.client().post('/login', data=self.user_data)
+        resp_json = json.loads(resp.data)
+        faker = Faker()
+        jwt_token = resp_json.get('token')
+        headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
+        self.client().post(
+                '/bucketlists',
+                data={'name': 'Extreme Activities'}, headers=headers)
+        for bucketeer in range(0, 100):
+            self.client().post(
+                '/bucketlists/1/items',
+                data={'name': faker.catch_phrase()},
+                headers=headers)
+        rv = self.client().get('/bucketlists?limit=20', headers=headers)
+        json_data = json.loads(rv.data)
+        self.assertEqual(len(json_data['message']), 20)
+        rv = self.client().get('/bucketlists?limit=1000', headers=headers)
+        self.assertEqual(rv.status_code, 406)
 
     def tearDown(self):
         with self.app.app_context():
