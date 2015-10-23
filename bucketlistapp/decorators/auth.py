@@ -9,7 +9,7 @@ import hashlib
 
 
 MESSAGES = {
-    "login": "You have been logged in successfully",username
+    "login": "You have been logged in successfully",
     "logout": "You have been logged out successfully",
     }
 
