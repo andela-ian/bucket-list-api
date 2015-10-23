@@ -1,7 +1,14 @@
-from flask import make_response, jsonify, session
+from flask import request, current_app
 from functools import wraps
-from models import User, db
-from tools import decypher
+from models import User, Session, db
+from flask.ext.api.exceptions import AuthenticationFailed
+import jwt
+
+
+MESSAGES = {
+    "login": "You have been logged in successfully",
+    "logout": "You have been logged out successfully",
+    }
 
 
 def check_auth(username, password):
@@ -11,11 +18,18 @@ def check_auth(username, password):
     return user.is_valid_password(password)
 
 
-def authenticate():
-    """Returns error message if authentication fails
+def tokenize(username, password):
+    """Generates a token and persists it in the database until
+    user logs out
     """
-    message = {'message': 'Unauthorized access'}
-    return make_response(jsonify(message), 401)
+    user_data = {'username': username, 'password': password}
+    user_query = User.query.filter_by(**user_data).first()
+    secret_key = current_app.config.get('SECRET_KEY')
+    token = jwt.encode(user_data, secret_key)
+    session = Session(user_id=user_query.id, token=token)
+    db.session.add(session)
+    db.session.commit()
+    return token
 
 
 def requires_auth(f):
@@ -23,11 +37,13 @@ def requires_auth(f):
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        auth = session['user']
-        if not auth:
-            return authenticate()
-        elif not check_auth(auth[0], auth[1]):
-            return authenticate()
+        try:
+            jwt_token = request.headers.get('Authorization')
+            session = Session.query.filter_by(token=jwt_token[7:]).first()
+        except:
+            raise AuthenticationFailed()
+        if not session:
+            return AuthenticationFailed()
         return f(*args, **kwargs)
     return decorated
 
@@ -35,8 +51,15 @@ def requires_auth(f):
 def get_current_user_id():
     """Returns the current user id in the session
     """
-    username, password = decypher(session['user'])
-    query_result = db.session.query(User).filter(
-            User.username == username,
-            User.password == password).first()
-    return query_result.id
+    jwt_token = request.headers.get('Authorization')
+    session = Session.query.filter_by(token=jwt_token[7:]).first()
+    return session.user_id
+
+
+def logout():
+    """Logs out a user from the session
+    """
+    jwt_token = request.headers.get('Authorization')
+    session = Session.query.filter_by(token=jwt_token[7:]).first()
+    Session.query.filter(Session.user_id == session.user_id).delete()
+    return True
