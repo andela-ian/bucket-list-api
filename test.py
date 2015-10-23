@@ -11,7 +11,7 @@ class BucketListTestCase(unittest.TestCase):
 
     def setUp(self):
         self.user_data = {'username': 'john', 'password': 'oldman'}
-        bucketlist_app = create_app('config.TestingConfig')
+        bucketlist_app = create_app('instance.config.TestingConfig')
         self.app = bucketlist_app
         self.client = bucketlist_app.test_client
         with bucketlist_app.app_context():
