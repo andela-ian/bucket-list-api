@@ -3,13 +3,31 @@ from functools import wraps
 from models import User, Session, BucketList, BucketListItem, db
 from flask.ext.api.exceptions import AuthenticationFailed, PermissionDenied, \
     NotFound
+import custom_exception
 import jwt
+import hashlib
 
 
 MESSAGES = {
     "login": "You have been logged in successfully",
     "logout": "You have been logged out successfully",
     }
+
+
+def register(username, password):
+    """Registers a user on the bucketlist service
+    """
+    user = User.query.filter_by(username=username).first()
+    if user is not None:
+        raise custom_exception.UserExists()
+    else:
+        user = User(username=username, password=password)
+        db.session.add(user)
+        db.session.commit()
+        return {
+            "message": "You have been registered successfully",
+            "more": "Continue to login to your personalized bucketlist"
+        }, 201
 
 
 def check_auth(username, password):
@@ -23,7 +41,10 @@ def tokenize(username, password):
     """Generates a token and persists it in the database until
     user logs out
     """
-    user_data = {'username': username, 'password': password}
+    user_data = {
+        'username': username,
+        'password': hashlib.sha512(password).hexdigest()
+    }
     user_query = User.query.filter_by(**user_data).first()
     secret_key = current_app.config.get('SECRET_KEY')
     token = jwt.encode(user_data, secret_key)
