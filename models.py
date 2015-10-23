@@ -1,5 +1,6 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from tools import list_object_transform
+import hashlib
 
 db = SQLAlchemy()
 
@@ -25,10 +26,10 @@ class User(Base):
 
     def __init__(self, username, password):
         self.username = username
-        self.password = password
+        self.password = hashlib.sha512(password).hexdigest()
 
     def is_valid_password(self, password):
-        return self.password == password
+        return self.password == hashlib.sha512(password).hexdigest()
 
     def __repr__(self):
         return '<User %r>' % self.username
