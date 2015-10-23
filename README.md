@@ -12,8 +12,8 @@ The MIME type for requests is always application/json
 
 
 ###EXAMPLE Requests
-
-```curl -i -H 'Accept: application/json' 'http://localhost:5000/register'
+```
+curl -i -H 'Accept: application/json' 'http://localhost:5000/register'
 
 HTTP/1.0 200 OK
 Content-Type: application/json
@@ -22,21 +22,23 @@ Server: Werkzeug/0.10.4 Python/2.7.10
 Date: Fri, 23 Oct 2015 17:33:15 GMT
 
 {"message": "Welcome to the bucketlist service", "more": "To register make a POST request to /register ENDPOINT with [username] and [password]"}
-
 ```
 
 *NOTE THAT* upon login, the generated token must be specified in the subsequent request headers. An example of how this looks is:
-```Authorization: Bearer _token_
+```
+Authorization: Bearer _token_
 ```
 
 ###First Things, First
 You should do an install of all package requirements in python setup or go about creating a virtual environment. 
-```pip install -r requirements.txt
+```
+pip install -r requirements.txt
 ```
 ###Create Database Tables
 You need to initialize database and tables. The following command does this and also adds a new user 
 with credentials: username _john_, password _oldman_
-```python manage.py createdb -t
+```
+python manage.py createdb -t
 ```
 
 ###How To Start The Server
