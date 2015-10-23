@@ -1,6 +1,6 @@
 from flask.ext.api import FlaskAPI
 from flask.ext.api.exceptions import APIException, \
-    AuthenticationFailed, NotFound, NotAcceptable
+    AuthenticationFailed, NotFound, NotAcceptable, ParseError
 from flask import request
 from models import db, BucketList, BucketListItem
 from tools import list_object_transform
@@ -17,6 +17,22 @@ def create_app(config_module="config.DevelopmentConfig"):
     app = FlaskAPI(__name__)
     app.config.from_object(config_module)
     db.init_app(app)
+
+    @app.route("/register", methods=["GET", "POST"])
+    def register():
+        if request.method == "GET":
+            return {
+                "message": "Welcome to the bucketlist service",
+                "more": "To register make a POST request to /register ENDPOINT\
+                with [username] and [password]"
+            }, 200
+        else:
+            username = request.form.get("username")
+            password = request.form.get("password")
+            if username and password:
+                return auth.register(username, password)
+            else:
+                raise ParseError()
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
@@ -61,7 +77,9 @@ def create_app(config_module="config.DevelopmentConfig"):
                 else:
                     if 0 <= int(limit) <= 100:
                         result_data = list_object_transform(
-                            BucketListItem.query.limit(limit)
+                            BucketListItem.query.paginate(
+                                1, int(limit), False
+                            ).items
                         )
                     else:
                         raise NotAcceptable()
