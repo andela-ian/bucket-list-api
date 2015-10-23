@@ -26,7 +26,7 @@ Date: Fri, 23 Oct 2015 17:33:15 GMT
 
 *NOTE THAT* upon login, the generated token must be specified in the subsequent request headers. An example of how this looks is:
 ```
-Authorization: Bearer _token_
+Authorization: Bearer <token>
 ```
 
 ###First Things, First
@@ -64,11 +64,11 @@ python run.py -h
 | [GET /bucketlists/:id](#) | Get single bucket list. |
 | [PUT /bucketlists/:id](#) | Update single bucket list. Request should have _name_ in form data. |
 | [DELETE /bucketlists/:id](#) | Delete single bucket list. |
-| [POST /bucketlists/:id/items] | Add a new item to this bucket list. Request should have _name_, _done_(defaults to False) in form data. |
+| [POST /bucketlists/:id/items](#) | Add a new item to this bucket list. Request should have _name_, _done_(defaults to False) in form data. |
 | [PUT /bucketlists/:id/items/:item_id](#) | Update this bucket list. Request should have _name_, _done_(True or False) in form data. |
-| [DELETE /bucketlists/:id/items/:item_id] | Delete this single bucket list |
-| [GET /bucketlists?limit=20] | Get 20 bucket list records belonging to user. Allows for a maximum of 100 records |
-| [GET /bucketlists?q=bucket1] | Search for a bucket lists with bucket1 in their name |
+| [DELETE /bucketlists/:id/items/:item_id](#) | Delete this single bucket list |
+| [GET /bucketlists?limit=20](#) | Get 20 bucket list records belonging to user. Allows for a maximum of 100 records |
+| [GET /bucketlists?q=bucket1](#) | Search for a bucket lists with bucket1 in their name |
 
 
 
