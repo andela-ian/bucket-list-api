@@ -22,16 +22,27 @@ class BucketListTestCase(unittest.TestCase):
 
     # Test endpoints
 
-    # Ensure that correct login behaves correctly
+    # Ensure that user can register correctly
+    # ENDPOINT: POST '/register'
+    def test_user_can_register(self):
+        user_data = {'username': 'Methuselah', 'password': 'very_old'}
+        rv = self.client().get('/register')
+        self.assertEqual(rv.status_code, 200)
+        rv = self.client().post('/register', data=user_data)
+        print rv.data
+        self.assertEqual(rv.status_code, 201)
+        self.assertIn("registered successfully", rv.data)
+
+    # Ensure that user can login
     # ENDPOINT: POST '/login'
-    def test_correct_login(self):
+    def test_user_can_login(self):
         rv = self.client().post('/login', data=self.user_data)
         self.assertEqual(rv.status_code, 200)
         self.assertIn(MESSAGES['login'], rv.data)
 
     # Ensure that logout behave correctly
     # ENDPOINT: GET '/logout'
-    def test_logout(self):
+    def test_user_can_logout(self):
         resp = self.client().post('/login', data=self.user_data)
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
@@ -198,7 +209,7 @@ class BucketListTestCase(unittest.TestCase):
         self.assertEqual(rv.status_code, 200)
 
     # Ensure user can gets 20 bucket list records up
-    # to a maximum of 100 records
+    # to a maximum of 100 records paginated
     # ENDPOINT: GET /bucketlists?limit=20
     def test_can_get_bucket_list_records_up_to_a_hundred(self):
         resp = self.client().post('/login', data=self.user_data)
