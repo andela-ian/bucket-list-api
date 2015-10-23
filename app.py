@@ -54,6 +54,7 @@ def create_app(config_module="config.DevelopmentConfig"):
             query = BucketList.query.filter(
                 user_id == user_id)
             limit = request.args.get('limit')
+            q = request.args.get('q')
             if query.all():
                 if not limit:
                     result_data = list_object_transform(query.all())
@@ -64,6 +65,12 @@ def create_app(config_module="config.DevelopmentConfig"):
                         )
                     else:
                         raise NotAcceptable()
+                if q:
+                    result_data = list_object_transform(
+                        BucketList.query.filter(
+                            BucketList.name.ilike('%{0}%'.format(q))
+                        ).all()
+                    )
                 return {'message': result_data}
             raise NotFound()
 
