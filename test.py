@@ -1,6 +1,6 @@
 from bucketlistapp.models import db, User
 from bucketlistapp.app import create_app
-from auth import MESSAGES
+from bucketlistapp.decorators.auth import MESSAGES
 from faker import Faker
 import unittest
 import os
