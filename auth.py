@@ -1,7 +1,8 @@
 from flask import request, current_app
 from functools import wraps
-from models import User, Session, db
-from flask.ext.api.exceptions import AuthenticationFailed
+from models import User, Session, BucketList, BucketListItem, db
+from flask.ext.api.exceptions import AuthenticationFailed, PermissionDenied, \
+    NotFound
 import jwt
 
 
@@ -30,6 +31,38 @@ def tokenize(username, password):
     db.session.add(session)
     db.session.commit()
     return token
+
+
+def belongs_to_user(f):
+    """Enforces model ownership by user
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        bucketlist_id = kwargs.get('id')
+        bucketlist = BucketList.query.get(int(bucketlist_id))
+        if bucketlist.created_by != get_current_user_id():
+            raise PermissionDenied()
+        kwargs['bucketlist'] = bucketlist
+        return f(*args, **kwargs)
+    return decorated
+
+
+def belongs_to_bucketlist(f):
+    """Enforces bucketlistitem ownership by bucketlist
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        bucketlist_id = kwargs.get('id')
+        bucketlistitem_id = kwargs.get('item_id')
+        bucketlistitem = BucketListItem.query.get(int(bucketlistitem_id))
+        if bucketlistitem:
+            try:
+                assert bucketlistitem.bucketlist_id == int(bucketlist_id)
+            except:
+                raise NotFound()
+        kwargs['bucketlistitem'] = bucketlistitem
+        return f(*args, **kwargs)
+    return decorated
 
 
 def requires_auth(f):
