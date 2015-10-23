@@ -1,6 +1,6 @@
 from flask import request, current_app
 from functools import wraps
-from models import User, Session, BucketList, BucketListItem, db
+from ..models import User, Session, BucketList, BucketListItem, db
 from flask.ext.api.exceptions import AuthenticationFailed, PermissionDenied, \
     NotFound
 from ..exceptions.wailer import UserExists
@@ -9,7 +9,7 @@ import hashlib
 
 
 MESSAGES = {
-    "login": "You have been logged in successfully",
+    "login": "You have been logged in successfully",username
     "logout": "You have been logged out successfully",
     }
 
