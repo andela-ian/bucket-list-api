@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from flask.ext.script import Manager
-from app import create_app
+from bucketlistapp.app import create_app
 from models import db, User
 
 manager = Manager(create_app)

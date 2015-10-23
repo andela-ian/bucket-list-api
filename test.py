@@ -1,5 +1,5 @@
 from models import db, User
-from app import create_app
+from bucketlistapp.app import create_app
 from auth import MESSAGES
 from faker import Faker
 import unittest

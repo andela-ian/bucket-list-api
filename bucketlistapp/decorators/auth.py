@@ -3,7 +3,7 @@ from functools import wraps
 from models import User, Session, BucketList, BucketListItem, db
 from flask.ext.api.exceptions import AuthenticationFailed, PermissionDenied, \
     NotFound
-import custom_exception
+from ..exceptions.wailer import UserExists
 import jwt
 import hashlib
 
@@ -18,12 +18,14 @@ def register(username, password):
     """Registers a user on the bucketlist service
     """
     user = User.query.filter_by(username=username).first()
+    db.session.remove()
     if user is not None:
-        raise custom_exception.UserExists()
+        raise UserExists()
     else:
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
+        db.session.remove()
         return {
             "message": "You have been registered successfully",
             "more": "Continue to login to your personalized bucketlist"
@@ -34,6 +36,7 @@ def check_auth(username, password):
     """Checks that user credentials is valid
     """
     user = User.query.filter_by(username='john').first()
+    db.session.remove()
     return user.is_valid_password(password)
 
 
@@ -51,6 +54,7 @@ def tokenize(username, password):
     session = Session(user_id=user_query.id, token=token)
     db.session.add(session)
     db.session.commit()
+    db.session.remove()
     return token
 
 
@@ -61,9 +65,9 @@ def belongs_to_user(f):
     def decorated(*args, **kwargs):
         bucketlist_id = kwargs.get('id')
         bucketlist = BucketList.query.get(int(bucketlist_id))
+        db.session.remove()
         if bucketlist.created_by != get_current_user_id():
             raise PermissionDenied()
-        kwargs['bucketlist'] = bucketlist
         return f(*args, **kwargs)
     return decorated
 
@@ -76,6 +80,7 @@ def belongs_to_bucketlist(f):
         bucketlist_id = kwargs.get('id')
         bucketlistitem_id = kwargs.get('item_id')
         bucketlistitem = BucketListItem.query.get(int(bucketlistitem_id))
+        db.session.remove()
         if bucketlistitem:
             try:
                 assert bucketlistitem.bucketlist_id == int(bucketlist_id)
@@ -94,6 +99,7 @@ def requires_auth(f):
         try:
             jwt_token = request.headers.get('Authorization')
             session = Session.query.filter_by(token=jwt_token[7:]).first()
+            db.session.remove()
         except:
             raise AuthenticationFailed()
         if not session:
@@ -107,6 +113,7 @@ def get_current_user_id():
     """
     jwt_token = request.headers.get('Authorization')
     session = Session.query.filter_by(token=jwt_token[7:]).first()
+    db.session.remove()
     return session.user_id
 
 
@@ -116,4 +123,5 @@ def logout():
     jwt_token = request.headers.get('Authorization')
     session = Session.query.filter_by(token=jwt_token[7:]).first()
     Session.query.filter(Session.user_id == session.user_id).delete()
+    db.session.remove()
     return True
