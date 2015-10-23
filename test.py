@@ -29,7 +29,6 @@ class BucketListTestCase(unittest.TestCase):
         rv = self.client().get('/register')
         self.assertEqual(rv.status_code, 200)
         rv = self.client().post('/register', data=user_data)
-        print rv.data
         self.assertEqual(rv.status_code, 201)
         self.assertIn("registered successfully", rv.data)
 
