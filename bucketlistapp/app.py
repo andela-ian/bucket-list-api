@@ -5,7 +5,7 @@ from exceptions.wailer import CredentialsRequired
 from flask import request
 from models import db, BucketList, BucketListItem
 from transformers.transform_to_dict import list_object_transform
-from .decorators import auth
+from decorators import auth
 
 
 def create_app(config_module="config.DevelopmentConfig"):
