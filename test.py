@@ -217,8 +217,30 @@ class BucketListTestCase(unittest.TestCase):
         rv = self.client().get('/bucketlists?limit=20', headers=headers)
         json_data = json.loads(rv.data)
         self.assertEqual(len(json_data['message']), 20)
+        self.assertEqual(rv.status_code, 200)
         rv = self.client().get('/bucketlists?limit=1000', headers=headers)
         self.assertEqual(rv.status_code, 406)
+
+    # Ensure user can search bucketlist
+    # ENDPOINT: GET /bucketlists?q=bucket1
+    def test_can_search_bucketlists(self):
+        resp = self.client().post('/login', data=self.user_data)
+        resp_json = json.loads(resp.data)
+        jwt_token = resp_json.get('token')
+        headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
+        names = [
+            "Extreme Action",
+            "Extreme Activities",
+            "Extreme Kill",
+        ]
+        for name in names:
+            self.client().post(
+                '/bucketlists',
+                data={'name': name}, headers=headers)
+        rv = self.client().get('/bucketlists?q=Extreme', headers=headers)
+        json_data = json.loads(rv.data)
+        self.assertEqual(len(json_data['message']), 3)
+        self.assertEqual(rv.status_code, 200)
 
     def tearDown(self):
         with self.app.app_context():
