@@ -1,4 +1,4 @@
-from models import db, User
+from bucketlistapp.models import db, User
 from bucketlistapp.app import create_app
 from auth import MESSAGES
 from faker import Faker
