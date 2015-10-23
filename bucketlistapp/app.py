@@ -1,16 +1,11 @@
 from flask.ext.api import FlaskAPI
-from flask.ext.api.exceptions import APIException, \
+from flask.ext.api.exceptions import \
     AuthenticationFailed, NotFound, NotAcceptable, ParseError
+from exceptions.wailer import CredentialsRequired
 from flask import request
 from models import db, BucketList, BucketListItem
 from transformers.transform_to_dict import list_object_transform
 from decorators import auth
-
-
-class CredentialsRequired(APIException):
-    """Raises a 202 accepted when the user first accesses GET /login"""
-    status_code = 202
-    detail = "Make a POST to '/login' with your credentials to begin a session"
 
 
 def create_app(config_module="config.DevelopmentConfig"):
@@ -18,7 +13,7 @@ def create_app(config_module="config.DevelopmentConfig"):
     app.config.from_object(config_module)
     db.init_app(app)
 
-    @app.route("/register", methods=["GET", "POST"])
+    @app.route("/auth/register", methods=["GET", "POST"])
     def register():
         if request.method == "GET":
             return {
@@ -34,7 +29,7 @@ def create_app(config_module="config.DevelopmentConfig"):
             else:
                 raise ParseError()
 
-    @app.route("/login", methods=["GET", "POST"])
+    @app.route("/auth/login", methods=["GET", "POST"])
     def login():
         if request.method == "GET":
             raise CredentialsRequired()
@@ -55,7 +50,7 @@ def create_app(config_module="config.DevelopmentConfig"):
         else:
             raise AuthenticationFailed()
 
-    @app.route("/logout", methods=["GET"])
+    @app.route("/auth/logout", methods=["GET"])
     @auth.requires_auth
     def logout():
         if auth.logout():
