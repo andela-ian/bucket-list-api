@@ -1,6 +1,6 @@
 BucketList Application API ![Travis build badge](https://travis-ci.org/andela-osule/bucket-list-api.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/andela-osule/bucket-list-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/andela-osule/bucket-list-api?branch=master)
 --------------------------------------------------
-This is a bucketlist service APIs built using Flask.
+This is a bucketlist service API built using Flask.
 
 Bucketlist API allows you to manage your own bucketlists.
 
@@ -30,7 +30,7 @@ Authorization: Bearer <token>
 ```
 
 ###First Things, First
-You should do an install of all package requirements in python setup or go about creating a virtual environment. 
+You should do an install of all package requirements in your python setup or go about creating a virtual environment. 
 ```
 pip install -r requirements.txt
 ```
@@ -47,7 +47,7 @@ Run the following command to start the server and begin listening for requests t
 python run.py production
 ```
 
-You can get available environment option by running:
+You can get available environment options by running:
 ```
 python run.py -h
 ```
@@ -66,9 +66,9 @@ python run.py -h
 | [DELETE /bucketlists/:id](#) | Delete single bucket list. |
 | [POST /bucketlists/:id/items](#) | Add a new item to this bucket list. Request should have _name_, _done_(defaults to False) in form data. |
 | [PUT /bucketlists/:id/items/:item_id](#) | Update this bucket list. Request should have _name_, _done_(True or False) in form data. |
-| [DELETE /bucketlists/:id/items/:item_id](#) | Delete this single bucket list |
-| [GET /bucketlists?limit=20](#) | Get 20 bucket list records belonging to user. Allows for a maximum of 100 records |
-| [GET /bucketlists?q=bucket1](#) | Search for a bucket lists with bucket1 in their name |
+| [DELETE /bucketlists/:id/items/:item_id](#) | Delete this single bucket list. |
+| [GET /bucketlists?limit=20](#) | Get 20 bucket list records belonging to user. Allows for a maximum of 100 records. |
+| [GET /bucketlists?q=bucket1](#) | Search for bucket lists with bucket1 in name. |
 
 
 
