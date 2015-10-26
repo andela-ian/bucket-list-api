@@ -10,7 +10,7 @@ import decorators.auth as auth
 
 def create_app(config_module="config.DevelopmentConfig"):
     '''Wraps the app with view functions decorated with routes into a single
-    exportable function.
+     exportable function.
     '''
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(config_module)
@@ -19,9 +19,9 @@ def create_app(config_module="config.DevelopmentConfig"):
     @app.route("/auth/register", methods=["GET", "POST"])
     def register():
         '''Responds to /auth/register (GET request) by returning
-        a JSON response containing instructions.
+         a JSON response containing instructions.
         It also returns a success message for a POST request to register a
-        new user.
+         new user.
         '''
         if request.method == "GET":
             return {
@@ -40,9 +40,9 @@ def create_app(config_module="config.DevelopmentConfig"):
     @app.route("/auth/login", methods=["GET", "POST"])
     def login():
         '''Responds to /auth/login (GET request) by raising a
-        CredentialsRequired Exception.
+         CredentialsRequired Exception.
         A valid POST request login a user and returns a token in
-        the JSON response returned.
+         the JSON response returned.
         '''
         if request.method == "GET":
             raise CredentialsRequired()
@@ -76,7 +76,9 @@ def create_app(config_module="config.DevelopmentConfig"):
     @auth.requires_auth
     def bucketlist():
         '''Retrieves all bucketlists for a logged in user and returns a
-        JSON response.
+         JSON response for (GET request) to /bucketlists.
+        POST requests to this route creates a bucketlist for the logged
+         in user.
         '''
         user_id = auth.get_current_user_id()
         if request.method == "GET":
@@ -119,11 +121,11 @@ def create_app(config_module="config.DevelopmentConfig"):
     @auth.belongs_to_user
     def actionable_bucketlist(id, **kwargs):
         '''Deletes a specific bucketlist record with its bucketlist
-        child items (DELETE request).
+         child items (DELETE request).
         Retrieves a specific bucketlist record with its bucketlist
-        child items (GET request).
+         child items (GET request).
         Updates a specific bucketlist record with its bucketlist
-        child items (UPDATE request).
+         child items (UPDATE request).
         '''
         bucketlist = BucketList.query.get(id)
         if request.method == "DELETE":
