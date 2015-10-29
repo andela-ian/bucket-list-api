@@ -17,6 +17,14 @@ class Base(db.Model):
         default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
 
+    def to_json(self):
+        """Converts model object into dict to ease Serialization
+        """
+        jsonData = dict()
+        for _key in self.__mapper__.c.keys():
+            jsonData[_key] = getattr(self, _key)
+        return jsonData
+
 
 class User(Base):
     """User model that maps to users table
@@ -107,14 +115,3 @@ class BucketListItem(Base):
         self.bucketlist_id = bucketlist_id
         self.name = name
         self.done = done
-
-    def to_json(self):
-        """Converts model object into dict to ease Serialization
-        """
-        return {
-            "id": self.id,
-            "name": self.name,
-            "date_created": self.date_created,
-            "date_modified": self.date_modified,
-            "done": self.done,
-        }
