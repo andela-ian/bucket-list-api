@@ -3,7 +3,7 @@ from models import User, Session, db
 from exceptions.wailer import UserExists
 import jwt
 import hashlib
-
+from datetime import datetime, timedelta
 
 MESSAGES = {
     "login": "You have been logged in successfully",
@@ -45,6 +45,7 @@ def tokenize(username, password):
     }
     user_query = User.query.filter_by(**user_data).first()
     secret_key = current_app.config.get('SECRET_KEY')
+    user_data['exp'] = datetime.utcnow() + timedelta(minutes=60)
     token = jwt.encode(user_data, secret_key)
     session = Session(user_id=user_query.id, token=token)
     session.save()
