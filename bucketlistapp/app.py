@@ -83,30 +83,27 @@ def create_app(config_module="config.DevelopmentConfig"):
         '''
         user_id = auth.get_current_user_id()
         if request.method == "GET":
-            query = BucketList.query.filter(
-                user_id == user_id)
-            limit = request.args.get('limit')
+            query = BucketList.query.filter_by(
+                created_by=user_id)
+            limit = request.args.get('limit', 20)
             q = request.args.get('q')
+            page = request.args.get('page', 1)
+            result_data = None
             if query.all():
-                if not limit:
-                    result_data = list_object_transform(query.all())
+                if not 0 <= int(limit) <= 100:
+                    raise NotAcceptable('Maximum limit per page is 100.')
                 else:
-                    if 0 <= int(limit) <= 100:
-                        result_data = list_object_transform(
-                            BucketListItem.query.paginate(
-                                1, int(limit), False
-                            ).items
-                        )
-                    else:
-                        raise NotAcceptable()
+                    result_data = query
                 if q:
-                    result_data = list_object_transform(
-                        BucketList.query.filter(
-                            BucketList.name.ilike('%{0}%'.format(q))
-                        ).all()
+                    result_data = query.filter(
+                        BucketList.name.ilike('%{0}%'.format(q))
                     )
+                result_data = list_object_transform(
+                        result_data.paginate(
+                            page, int(limit), False
+                        ).items)
                 return {'message': result_data}
-            raise NotFound()
+            raise NotFound('There are no bucketlist for this user')
 
         else:
             name = request.form.get("name")
