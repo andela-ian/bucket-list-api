@@ -1,4 +1,4 @@
-BucketList Application API ![Travis build badge](https://travis-ci.org/andela-osule/bucket-list-api.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/andela-osule/bucket-list-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/andela-osule/bucket-list-api?branch=master)
+BucketList Application API [![Travis build badge](https://travis-ci.org/andela-osule/bucket-list-api.svg?branch=master)](https://travis-ci.org/andela-osule/bucket-list-api) [![Coverage Status](https://coveralls.io/repos/andela-osule/bucket-list-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/andela-osule/bucket-list-api?branch=master)
 --------------------------------------------------
 This is a bucketlist service API built using Flask.
 
