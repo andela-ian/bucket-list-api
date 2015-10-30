@@ -1,9 +1,13 @@
-from flask import request
+from flask import request, current_app
 from functools import wraps
-from ..models import Session, BucketList, BucketListItem, db
+from ..models import Session, BucketList, BucketListItem, db, User
 from flask.ext.api.exceptions import AuthenticationFailed, PermissionDenied, \
     NotFound
+from ..exceptions.wailer import ValidationError
 from auth import get_current_user_id
+from flask.ext.sqlalchemy import sqlalchemy as S
+import jwt
+
 
 MESSAGES = {
     "login": "You have been logged in successfully",
@@ -51,11 +55,17 @@ def requires_auth(f):
     def decorated(*args, **kwargs):
         try:
             jwt_token = request.headers.get('Authorization')
-            session = Session.query.filter_by(token=jwt_token[7:]).first()
-            db.session.remove()
-        except:
-            raise AuthenticationFailed()
-        if not session:
-            return AuthenticationFailed()
+            secret_key = current_app.config.get('SECRET_KEY')
+            try:
+                decoded_jwt = jwt.decode(jwt_token[7:], secret_key)
+            except jwt.ExpiredSignatureError:
+                raise PermissionDenied('Your token has expired! Please login.')
+            User.query.filter_by(
+                username=decoded_jwt['username'],
+                password=decoded_jwt['password']).one()
+            if not Session.query.filter_by(token=jwt_token[7:]):
+                raise AuthenticationFailed()
+        except (S.orm.exc.MultipleResultsFound, S.orm.exc.NoResultFound):
+            raise ValidationError()
         return f(*args, **kwargs)
     return decorated
