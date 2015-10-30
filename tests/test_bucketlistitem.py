@@ -101,7 +101,7 @@ class BucketListItemTestCase(BaseTestCase):
         self.assertEqual(rv.status_code, 201)
         for bucketeer in range(0, 100):
             self.client().post(
-                '/bucketlists/1/items',
+                '/bucketlists',
                 data={'name': faker.catch_phrase()},
                 headers=headers)
         rv = self.client().get('/bucketlists?limit=20', headers=headers)
