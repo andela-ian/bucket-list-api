@@ -21,7 +21,7 @@ class BucketListTestCase(BaseTestCase):
         rv = self.client().get('/bucketlists', headers=headers)
         self.assertIn('Witness a miracle', rv.data)
 
-        self.client().get('/auth/logout')
+        self.client().get('/auth/logout', headers=headers)
 
     # Ensure user can create new bucketlist
     # ENDPOINT: POST '/bucketlists'
@@ -34,7 +34,7 @@ class BucketListTestCase(BaseTestCase):
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
         self.assertEqual(rv.status_code, 201)
-        self.client().get('/auth/logout')
+        self.client().get('/auth/logout', headers=headers)
 
     # Ensure user can get buckletlist by id
     # ENDPOINT: GET /bucketlists/<id>
@@ -43,9 +43,10 @@ class BucketListTestCase(BaseTestCase):
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
-        self.client().post(
+        rv = self.client().post(
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
+        self.assertEqual(rv.status_code, 201)
         rv = self.client().get(
             '/bucketlists/1',
             headers=headers)
@@ -60,9 +61,10 @@ class BucketListTestCase(BaseTestCase):
         headers = {
             'Authorization': 'Bearer {0}'.format(jwt_token),
         }
-        self.client().post(
+        rv = self.client().post(
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
+        self.assertEqual(rv.status_code, 201)
         rv = self.client().put(
             '/bucketlists/1',
             data={'name': 'Witness the change'},
@@ -78,9 +80,10 @@ class BucketListTestCase(BaseTestCase):
         headers = {
             'Authorization': 'Bearer {0}'.format(jwt_token),
         }
-        self.client().post(
+        rv = self.client().post(
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
+        self.assertEqual(rv.status_code, 201)
         rv = self.client().delete(
             '/bucketlists/1',
             headers=headers)

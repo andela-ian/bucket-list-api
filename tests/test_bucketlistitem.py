@@ -12,9 +12,10 @@ class BucketListItemTestCase(BaseTestCase):
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
-        self.client().post(
+        rv = self.client().post(
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
+        self.assertEqual(rv.status_code, 201)
         rv = self.client().post(
             '/bucketlists/1/items',
             data={'name': 'Water changes into wine'},
@@ -28,13 +29,15 @@ class BucketListItemTestCase(BaseTestCase):
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
-        self.client().post(
+        rv = self.client().post(
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
-        self.client().post(
+        self.assertEqual(rv.status_code, 201)
+        rv = self.client().post(
             '/bucketlists/1/items',
             data={'name': 'Water changes into wine'},
             headers=headers)
+        self.assertEqual(rv.status_code, 201)
         rv = self.client().get(
             '/bucketlists/1/items/1',
             headers=headers)
@@ -47,13 +50,15 @@ class BucketListItemTestCase(BaseTestCase):
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
-        self.client().post(
+        rv = self.client().post(
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
-        self.client().post(
+        self.assertEqual(rv.status_code, 201)
+        rv = self.client().post(
             '/bucketlists/1/items',
             data={'name': 'Water changes into wine'},
             headers=headers)
+        self.assertEqual(rv.status_code, 201)
         rv = self.client().put(
             '/bucketlists/1/items/1',
             data={'name': 'Reverse the time'},
@@ -67,13 +72,15 @@ class BucketListItemTestCase(BaseTestCase):
         resp_json = json.loads(resp.data)
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
-        self.client().post(
+        rv = self.client().post(
             '/bucketlists',
             data={'name': 'Witness a miracle'}, headers=headers)
-        self.client().post(
+        self.assertEqual(rv.status_code, 201)
+        rv = self.client().post(
             '/bucketlists/1/items',
             data={'name': 'Water changes into wine'},
             headers=headers)
+        self.assertEqual(rv.status_code, 201)
         rv = self.client().delete(
             '/bucketlists/1/items/1',
             headers=headers)
@@ -88,9 +95,10 @@ class BucketListItemTestCase(BaseTestCase):
         faker = Faker()
         jwt_token = resp_json.get('token')
         headers = {'Authorization': 'Bearer {0}'.format(jwt_token)}
-        self.client().post(
+        rv = self.client().post(
                 '/bucketlists',
                 data={'name': 'Extreme Activities'}, headers=headers)
+        self.assertEqual(rv.status_code, 201)
         for bucketeer in range(0, 100):
             self.client().post(
                 '/bucketlists/1/items',
@@ -120,6 +128,6 @@ class BucketListItemTestCase(BaseTestCase):
                 '/bucketlists',
                 data={'name': name}, headers=headers)
         rv = self.client().get('/bucketlists?q=Extreme', headers=headers)
+        self.assertEqual(rv.status_code, 200)
         json_data = json.loads(rv.data)
         self.assertEqual(len(json_data['message']), 3)
-        self.assertEqual(rv.status_code, 200)
