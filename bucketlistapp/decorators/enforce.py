@@ -9,12 +9,6 @@ from flask.ext.sqlalchemy import sqlalchemy as S
 import jwt
 
 
-MESSAGES = {
-    "login": "You have been logged in successfully",
-    "logout": "You have been logged out successfully",
-    }
-
-
 def belongs_to_user(f):
     """Enforces model ownership by user
     """
