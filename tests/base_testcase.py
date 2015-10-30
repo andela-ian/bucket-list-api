@@ -14,8 +14,7 @@ class BaseTestCase(unittest.TestCase):
         with bucketlist_app.app_context():
             db.create_all()
             user = User(**self.user_data)
-            db.session.add(user)
-            db.session.commit()
+            user.save()
 
     def tearDown(self):
             with self.app.app_context():
