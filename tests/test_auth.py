@@ -1,5 +1,5 @@
 from base_testcase import BaseTestCase
-from bucketlistapp.decorators.auth import MESSAGES
+from bucketlistapp.auth import MESSAGES
 import json
 
 
