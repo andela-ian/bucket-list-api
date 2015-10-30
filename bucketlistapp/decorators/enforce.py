@@ -4,7 +4,7 @@ from ..models import Session, BucketList, BucketListItem, db, User
 from flask.ext.api.exceptions import AuthenticationFailed, PermissionDenied, \
     NotFound
 from ..exceptions.wailer import ValidationError
-from auth import get_current_user_id
+from ..auth import get_current_user_id
 from flask.ext.sqlalchemy import sqlalchemy as S
 import jwt
 
