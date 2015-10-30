@@ -13,3 +13,10 @@ class CredentialsRequired(APIException):
     """
     status_code = 202
     detail = "Make a POST to '/login' with your credentials to begin a session"
+
+
+class ValidationError(APIException):
+    """Raises a token is not valid when the token can't be matched to a user record
+    """
+    status_code = 406
+    detail = 'Invalid token'
