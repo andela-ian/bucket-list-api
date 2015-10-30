@@ -1,9 +1,11 @@
 from transformers.transform_to_dict import list_object_transform
-import hashlib
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import sqlalchemy
+import hashlib
 
 
 db = SQLAlchemy()
+class_mapper = sqlalchemy.orm.class_mapper
 
 
 class Base(db.Model):
@@ -22,11 +24,18 @@ class Base(db.Model):
         """Converts model object into dict to ease Serialization
         """
         jsonData = dict()
-        for _key in self.__mapper__.c.keys():
-            if _key is 'bucketlistitems':
-                jsonData[_key] = list_object_transform(getattr(self, _key))
+        for prop in class_mapper(self.__class__).iterate_properties:
+
+            if prop.key == 'user':
                 continue
-            jsonData[_key] = getattr(self, _key)
+
+            if prop.key == 'bucketlistitems':
+                prop_items = getattr(self, prop.key)
+                jsonData[prop.key] = list_object_transform(
+                    prop_items)
+                continue
+
+            jsonData[prop.key] = getattr(self, prop.key)
         return jsonData
 
     def save(self):
