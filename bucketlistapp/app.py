@@ -5,7 +5,8 @@ from exceptions.wailer import CredentialsRequired
 from flask import request
 from models import db, BucketList, BucketListItem
 from transformers.transform_to_dict import list_object_transform
-import decorators.auth as auth
+import decorators.enforce as enforce
+import auth
 
 
 def create_app(config_module="config.DevelopmentConfig"):
@@ -64,7 +65,7 @@ def create_app(config_module="config.DevelopmentConfig"):
             raise AuthenticationFailed()
 
     @app.route("/auth/logout", methods=["GET"])
-    @auth.requires_auth
+    @enforce.requires_auth
     def logout():
         '''Responds to /auth/logout (GET request) and logout a user.
         '''
@@ -73,7 +74,7 @@ def create_app(config_module="config.DevelopmentConfig"):
         raise NotFound()
 
     @app.route("/bucketlists", methods=["POST", "GET"])
-    @auth.requires_auth
+    @enforce.requires_auth
     def bucketlist():
         '''Retrieves all bucketlists for a logged in user and returns a
          JSON response for (GET request) to /bucketlists.
@@ -110,15 +111,14 @@ def create_app(config_module="config.DevelopmentConfig"):
         else:
             name = request.form.get("name")
             a_bucketlist = BucketList(created_by=user_id, name=name)
-            db.session.add(a_bucketlist)
-            db.session.commit()
+            a_bucketlist.save()
             return {
                 "message": "Bucketlist was created successfully",
                 "bucketlist": a_bucketlist.to_json()}, 201
 
     @app.route("/bucketlists/<int:id>", methods=["GET", "DELETE", "PUT"])
-    @auth.requires_auth
-    @auth.belongs_to_user
+    @enforce.requires_auth
+    @enforce.belongs_to_user
     def actionable_bucketlist(id, **kwargs):
         '''Deletes a specific bucketlist record with its bucketlist
          child items (DELETE request).
@@ -129,19 +129,18 @@ def create_app(config_module="config.DevelopmentConfig"):
         '''
         bucketlist = BucketList.query.get(id)
         if request.method == "DELETE":
-            db.session.delete(bucketlist)
-            db.session.commit()
+            bucketlist.delete()
             return {"message": "Bucketlist was deleted successfully"}, 200
 
         elif request.method == "PUT":
             name = request.form.get("name")
             bucketlist.name = name
-            db.session.commit()
+            bucketlist.save()
         return bucketlist.to_json(), 200
 
     @app.route("/bucketlists/<int:id>/items", methods=["POST"])
-    @auth.requires_auth
-    @auth.belongs_to_user
+    @enforce.requires_auth
+    @enforce.belongs_to_user
     def create_bucketlist_item(id, **kwargs):
         '''Creates a new bucketlist child item of a bucketlist.
         Returns a success message.
@@ -149,8 +148,7 @@ def create_app(config_module="config.DevelopmentConfig"):
         name = request.form.get('name')
         done = request.form.get('done')
         bucketlistitem = BucketListItem(bucketlist_id=id, name=name, done=done)
-        db.session.add(bucketlistitem)
-        db.session.commit()
+        bucketlistitem.save()
         return {
             "message": "Bucketlist item was created successfully",
             "bucketlistitem": bucketlistitem.to_json()}, 201
@@ -158,9 +156,9 @@ def create_app(config_module="config.DevelopmentConfig"):
     @app.route(
         "/bucketlists/<int:id>/items/<int:item_id>",
         methods=["GET", "PUT", "DELETE"])
-    @auth.requires_auth
-    @auth.belongs_to_user
-    @auth.belongs_to_bucketlist
+    @enforce.requires_auth
+    @enforce.belongs_to_user
+    @enforce.belongs_to_bucketlist
     def actionable_bucketlist_item(id, item_id, **kwargs):
         '''Deletes a specific bucketlist child item (DELETE request).
         Retrieves a specific bucketlist child item (GET request).
@@ -168,17 +166,13 @@ def create_app(config_module="config.DevelopmentConfig"):
         '''
         bucketlistitem = kwargs.get('bucketlistitem')
         if request.method == "DELETE":
-            db.session.delete(bucketlistitem)
-            db.session.commit()
+            bucketlistitem.delete()
             return {"message": "Bucketlist item was deleted successfully"}, 200
 
         elif request.method == "PUT":
             name = request.form.get("name")
             done = request.form.get("done")
-            bucketlistitem.name = name
-            bucketlistitem.done = done
             bucketlistitem.id = item_id
-            bucketlistitem.bucketlist_id = id
-            db.session.commit()
+            bucketlistitem.extend(bucketlist_id=id, item_name=name, done=done)
         return bucketlistitem.to_json(), 200
     return app
