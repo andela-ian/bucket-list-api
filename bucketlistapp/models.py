@@ -2,6 +2,7 @@ from transformers.transform_to_dict import list_object_transform
 import hashlib
 from flask.ext.sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
 
 
@@ -22,8 +23,23 @@ class Base(db.Model):
         """
         jsonData = dict()
         for _key in self.__mapper__.c.keys():
+            if _key is 'bucketlistitems':
+                jsonData[_key] = list_object_transform(getattr(self, _key))
+                continue
             jsonData[_key] = getattr(self, _key)
         return jsonData
+
+    def save(self):
+        """Saves model object instance
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """Delete model object instance
+        """
+        db.session.delete(self)
+        db.session.commit()
 
 
 class User(Base):
@@ -76,18 +92,6 @@ class BucketList(Base):
         self.created_by = created_by
         self.name = name
 
-    def to_json(self):
-        """Converts model object into dict to ease Serialization
-        """
-        return {
-            "id": self.id,
-            "name": self.name,
-            "bucketlistitems": list_object_transform(self.bucketlistitems),
-            "date_created": self.date_created,
-            "date_modified": self.date_modified,
-            "created_by": self.created_by,
-        }
-
     @staticmethod
     def for_logged_user(user_id):
         """Modifies query result to return records belonging to logged
@@ -109,9 +113,16 @@ class BucketListItem(Base):
     bucketlist_id = db.Column(db.Integer, db.ForeignKey(BucketList.id))
 
     def __init__(self, bucketlist_id, name, done=False):
-        """Initialize model with <bucketlist_id> and <name>.
+        """Initializes model with <bucketlist_id> and <name>.
         <done> is optional
         """
         self.bucketlist_id = bucketlist_id
         self.name = name
         self.done = done
+
+    def extend(self, **kwargs):
+        """Updates the model object instance
+        """
+        self.name = kwargs.get('name')
+        self.done = kwargs.get('done', False)
+        db.session.commit()
