@@ -38,7 +38,7 @@ pip install -r requirements.txt
 You need to initialize database and tables. The following command does this and also adds a new user 
 with credentials: username _john_, password _oldman_
 ```
-python manage.py createdb -t
+python manager.py createdb -t
 ```
 
 ###How To Start The Server
